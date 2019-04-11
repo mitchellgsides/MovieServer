@@ -3,27 +3,25 @@ const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 const MOVIES = require("./movies");
-require("dotenv");
+require("dotenv").config();
 
 const app = express();
 app.use(helmet());
 app.use(morgan("tiny"));
 app.use(cors());
 
-function authorizationBearer(req, res, next) {
-  const authToken = req.get("Authorization");
+app.use(function validateBearerToken(req, res, next) {
+  const authToken = req.get("Authorization").split(" ")[2];
   const apiToken = process.env.API_TOKEN;
   console.log(authToken);
   console.log(apiToken);
 
-  if (!authToken || authToken.split(" ")[1] !== apiToken) {
+  if (!authToken || authToken !== apiToken) {
     return res.status(401).json({ error: "Unauthorized request" });
   }
   // move to the next middleware
   next();
-}
-
-app.use(authorizationBearer(req, res, next));
+});
 
 app.get("/movies", (req, res) => {
   let results = MOVIES;

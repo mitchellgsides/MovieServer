@@ -9,7 +9,7 @@
     "start": "node server"
   },
   "keywords": [],
-  "engine": {
+  "engines": {
     "node": "10.15.2"
   },
   "author": "",

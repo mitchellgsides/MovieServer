@@ -23,6 +23,16 @@ app.use(function validateBearerToken(req, res, next) {
   next();
 });
 
+app.use((error, req, res, next) => {
+  let response;
+  if (process.env.NODE_ENV === "production") {
+    response = { error: { message: "server error" } };
+  } else {
+    response = { error };
+  }
+  res.status(500).json(response);
+});
+
 app.get("/movies", (req, res) => {
   let results = MOVIES;
   const { genre, country, vote } = req.query;
@@ -53,16 +63,6 @@ app.get("/movies", (req, res) => {
     return res.json(results);
   }
   return res.send("Sorry, no movies match those parameters.");
-});
-
-app.use((error, req, res, next) => {
-  let response;
-  if (process.env.NODE_ENV === "production") {
-    response = { error: { message: "server error" } };
-  } else {
-    response = { error };
-  }
-  res.status(500).json(response);
 });
 
 const PORT = process.env.PORT || 8000;

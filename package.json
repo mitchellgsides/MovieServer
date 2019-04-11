@@ -9,6 +9,9 @@
     "start": "node server"
   },
   "keywords": [],
+  "engine": {
+    "node": "10.15.2"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {

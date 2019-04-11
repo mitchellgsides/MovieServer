@@ -7,14 +7,14 @@ require("dotenv").config();
 
 const app = express();
 app.use(helmet());
-app.use(morgan("tiny"));
+const morganSettings =
+  process.env.NODE_ENC === "production" ? "tiny" : "common";
+app.use(morgan(morganSettings));
 app.use(cors());
 
 app.use(function validateBearerToken(req, res, next) {
   const authToken = req.get("Authorization").split(" ")[2];
   const apiToken = process.env.API_TOKEN;
-  console.log(authToken);
-  console.log(apiToken);
 
   if (!authToken || authToken !== apiToken) {
     return res.status(401).json({ error: "Unauthorized request" });
@@ -55,8 +55,16 @@ app.get("/movies", (req, res) => {
   return res.send("Sorry, no movies match those parameters.");
 });
 
-const PORT = 8000;
-
-app.listen(PORT, () => {
-  console.log("Welcome, movie lovers!");
+app.use((error, req, res, next) => {
+  let response;
+  if (process.env.NODE_ENV === "production") {
+    response = { error: { message: "server error" } };
+  } else {
+    response = { error };
+  }
+  res.status(500).json(response);
 });
+
+const PORT = process.env.PORT || 8000;
+
+app.listen(PORT, () => {});
